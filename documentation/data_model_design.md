@@ -1,136 +1,140 @@
-# Hospital Operations, Cost & Patient Flow Intelligence
-
-## Analytical Data Model Design
+# Data Model Design
+## Hospital Operations, Cost & Patient Flow Intelligence
 
 ### 1. Overview
 
-The analytical data model was developed to support the investigation of hospital encounter volumes, patient flow, encounter costs, payer coverage and procedure utilisation.
+A dimensional data model was developed to support encounter, financial, payer and procedure analysis in Power BI.
 
-The model uses a dimensional modelling approach consisting of two fact tables and five dimension tables.
-
-The design separates encounter-level and procedure-level information to preserve the correct level of detail and prevent the duplication of encounter-level financial values when analysing procedures.
+The model separates encounter-level records from procedure-level records to preserve their respective grains and prevent duplication when analysing costs and activity.
 
 ### 2. Fact Tables
 
-| Fact table | Grain | Records |
-| --- | --- | ---: |
-| FactEncounters | One row per encounter | 27,891 |
-| FactProcedures | One row per procedure | 47,701 |
+#### FactEncounters
 
-**FactEncounters*
+**Grain:** One row per encounter.
 
-Contains encounter-level information, including:
+| Attribute | Description |
+|---|---|
+| Id | Unique encounter identifier |
+| PATIENT | Patient reference key |
+| PAYER | Payer reference key |
+| ORGANIZATION | Organisation reference key |
+| ENCOUNTERCLASS | Encounter classification |
+| START / STOP | Encounter timestamps |
+| BASE_ENCOUNTER_COST | Encounter base cost |
+| TOTAL_CLAIM_COST | Total claim cost |
+| PAYER_COVERAGE | Recorded payer coverage |
+| DURATION_HOURS | Derived elapsed encounter duration |
+| START_DATE / STOP_DATE | Derived date fields |
+| OVER_24_HOURS | Flag for duration exceeding 24 hours |
 
-- Encounter identifier
-- Patient, payer and organisation references
-- Encounter class
-- Start and stop timestamps
-- Base encounter cost
-- Total claim cost
-- Payer coverage
-- Derived encounter duration
-- Encounter start and stop dates
-- Indicator for encounters exceeding 24 hours
+**Record count:** 27,891.
 
-**FactProcedures*
+#### FactProcedures
 
-Contains procedure-level information, including:
+**Grain:** One row per procedure.
 
-- Generated procedure row identifier
-- Patient and encounter references
-- Procedure start and stop timestamps
-- Procedure code and description
-- Procedure base cost
-- Derived procedure duration
-- Procedure date
-- Zero-duration indicator
-- Payer, organisation and encounter class inherited from the associated encounter
-- Encounter date
+| Attribute | Description |
+|---|---|
+| PROCEDURE_ID | Generated unique procedure row identifier |
+| PATIENT | Patient reference key |
+| ENCOUNTER | Related encounter identifier |
+| PAYER | Payer inherited from the related encounter |
+| ORGANIZATION | Organisation inherited from the related encounter |
+| ENCOUNTERCLASS | Encounter class inherited from the related encounter |
+| START / STOP | Procedure timestamps |
+| CODE | Procedure code |
+| DESCRIPTION | Procedure description |
+| BASE_COST | Procedure base cost |
+| DURATION_HOURS | Derived elapsed procedure duration |
+| PROCEDURE_DATE | Derived procedure date |
+| ENCOUNTER_DATE | Related encounter date |
+| ZERO_DURATION | Flag for zero-duration procedures |
 
-The generated `PROCEDURE_ID` provides a unique row identifier for the prepared table. It is not an original identifier supplied by the source dataset.
+**Record count:** 47,701.
+
+`PROCEDURE_ID` was generated to uniquely identify procedure rows because the source procedure dataset did not provide a separate unique procedure identifier.
 
 ### 3. Dimension Tables
 
-| Dimension | Records | Purpose |
-| --- | ---: | --- |
-| DimPatients | 974 | Supports analysis by patient reference |
-| DimPayers | 10 | Supports analysis by payer |
-| DimOrganizations | 1 | Supports organisation-level analysis |
-| DimEncounterClass | 6 | Supports comparison across encounter classes |
-| DimDate | 4,053 | Supports daily, monthly, quarterly and yearly analysis |
+| Dimension | Key | Records | Purpose |
+|---|---|---:|---|
+| DimPatients | PATIENT | 974 | Patient reference and distinct patient counting |
+| DimPayers | PAYER | 10 | Payer identification and grouping |
+| DimOrganizations | ORGANIZATION | 1 | Organisation reference |
+| DimEncounterClass | ENCOUNTERCLASS | 6 | Encounter classification |
+| DimDate | DATE | 4,053 | Calendar analysis and date filtering |
 
-The patient dimension contains only the patient reference key. Direct patient-identifying information was excluded from the analytical model to minimise unnecessary exposure of personal information.
+The patient dimension contains only the patient reference key. Patient demographic and contact details were excluded from the analytical model.
 
 The date dimension covers 2 January 2011 to 5 February 2022 and includes year, quarter, month, year-month, day and day-name attributes.
 
 ### 4. Relationship Design
 
-Each dimension is designed to have a one-to-many relationship with the relevant fact tables.
+The model uses one-to-many relationships from dimensions to fact tables.
 
-| Dimension key | Fact table | Corresponding foreign key |
-| --- | --- | --- |
-| DimPatients[PATIENT] | FactEncounters | PATIENT |
-| DimPatients[PATIENT] | FactProcedures | PATIENT |
-| DimPayers[PAYER] | FactEncounters | PAYER |
-| DimPayers[PAYER] | FactProcedures | PAYER |
-| DimOrganizations[ORGANIZATION] | FactEncounters | ORGANIZATION |
-| DimOrganizations[ORGANIZATION] | FactProcedures | ORGANIZATION |
-| DimEncounterClass[ENCOUNTERCLASS] | FactEncounters | ENCOUNTERCLASS |
-| DimEncounterClass[ENCOUNTERCLASS] | FactProcedures | ENCOUNTERCLASS |
-| DimDate[DATE] | FactEncounters | START_DATE |
-| DimDate[DATE] | FactProcedures | PROCEDURE_DATE |
+| One side | Many side | Relationship |
+|---|---|---|
+| DimPatients | FactEncounters | PATIENT |
+| DimPatients | FactProcedures | PATIENT |
+| DimPayers | FactEncounters | PAYER |
+| DimPayers | FactProcedures | PAYER |
+| DimOrganizations | FactEncounters | ORGANIZATION |
+| DimOrganizations | FactProcedures | ORGANIZATION |
+| DimEncounterClass | FactEncounters | ENCOUNTERCLASS |
+| DimEncounterClass | FactProcedures | ENCOUNTERCLASS |
+| DimDate | FactEncounters | DATE to START_DATE |
+| DimDate | FactProcedures | DATE to PROCEDURE_DATE |
 
-The intended Power BI relationships use single-direction filtering from dimensions to fact tables.
+All relationships are active and use single-direction filtering from dimensions to fact tables.
 
-No direct relationship is created between FactEncounters and FactProcedures. Shared dimensions provide the common analytical context.
+No direct relationship was created between FactEncounters and FactProcedures.
 
 ### 5. Modelling Decisions
 
-**Separate fact tables*
+**Separate fact tables**
 
-Encounter and procedure records have different levels of detail. Keeping them separate prevents encounter-level costs from being duplicated when an encounter has multiple procedures.
+Encounters and procedures have different levels of detail. Combining procedure rows directly with encounter rows would repeat encounter-level financial values for encounters containing multiple procedures.
 
-**Inherited encounter attributes*
+Keeping the fact tables separate avoids this duplication.
 
-Payer, organisation and encounter class are carried into FactProcedures through a validated many-to-one merge with FactEncounters. This allows procedure analysis to use the same analytical dimensions.
+**Inherited procedure attributes**
 
-**Date attributes*
+Payer, organisation and encounter class are inherited by each procedure from its associated encounter. This enables shared dimension filtering without creating a direct fact-to-fact relationship.
 
-Encounter analysis uses the encounter start date, while procedure analysis uses the procedure start date. Original timestamps are retained for more detailed analysis.
+**Date modelling**
 
-**Data quality exceptions*
+The date dimension filters encounters by encounter start date and procedures by procedure date.
 
-Long encounter durations and zero-duration procedures are retained and flagged rather than automatically deleted. These records require careful interpretation.
+**Derived duration**
 
-**Financial interpretation*
+Duration is calculated from the difference between stop and start timestamps. Original timestamps are retained.
 
-Total claim cost is not assumed to equal the sum of encounter base cost and procedure base costs. Differences are treated as reconciliation observations rather than confirmed errors.
+**Financial interpretation**
 
-### 6. Model Validation
+The model does not assume that total claim cost equals encounter base cost plus procedure base costs. These fields are analysed separately.
 
-The prepared model was subjected to integrity checks before export.
+### 6. Validation
 
 | Validation | Result |
-| --- | --- |
-| FactEncounters row count | 27,891 — passed |
-| FactProcedures row count | 47,701 — passed |
-| FactEncounters unique primary keys | 27,891 — passed |
-| FactProcedures unique primary keys | 47,701 — passed |
-| Missing fact primary keys | 0 |
-| Unmatched fact-to-dimension references | 0 across eight checks |
-| Unmatched procedure-to-encounter references | 0 |
-| Procedure-to-encounter patient mismatches | 0 |
-| Encounter dates outside calendar | 0 |
-| Procedure dates outside calendar | 0 |
-
-All tested relationship and integrity checks passed.
+|---|---|
+| FactEncounters record count | 27,891 — PASS |
+| FactProcedures record count | 47,701 — PASS |
+| FactEncounters unique keys | 27,891 — PASS |
+| FactProcedures unique keys | 47,701 — PASS |
+| Missing fact keys | 0 — PASS |
+| Tested dimension references | 0 unmatched — PASS |
+| Procedure-to-encounter references | 0 unmatched — PASS |
+| Procedure patient consistency | 0 mismatches — PASS |
+| Encounter dates outside date dimension | 0 |
+| Procedure dates outside date dimension | 0 |
 
 ### 7. Exported Analytical Tables
 
-Seven CSV files were exported to `data/processed/`:
+The following seven prepared CSV files were exported to `data/processed/`:
 
 | File | Records | Columns |
-| --- | ---: | ---: |
+|---|---:|---:|
 | fact_encounters.csv | 27,891 | 14 |
 | fact_procedures.csv | 47,701 | 15 |
 | dim_patients.csv | 974 | 1 |
@@ -139,10 +143,8 @@ Seven CSV files were exported to `data/processed/`:
 | dim_encounter_class.csv | 6 | 1 |
 | dim_date.csv | 4,053 | 8 |
 
-These files form the prepared analytical dataset for the Power BI dashboard.
-
 ### 8. Conclusion
 
-The analytical data model has been constructed and validated. It preserves the original encounter and procedure record counts, maintains the tested relationships and provides a structured foundation for analysing hospital operations, costs, payer coverage and procedure utilisation.
+The dimensional model preserves the encounter and procedure grains, supports shared filtering and passed the documented relationship and record-count checks.
 
-The next stage is to implement the model in Power BI and develop the interactive dashboard.
+It provides the analytical foundation for the Power BI dashboard and its operational, financial and procedure utilisation measures.
