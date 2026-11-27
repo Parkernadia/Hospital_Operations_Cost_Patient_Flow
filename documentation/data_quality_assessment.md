@@ -1,4 +1,5 @@
 # Data Quality Assessment
+
 ## Hospital Operations, Cost & Patient Flow Intelligence
 
 ### 1. Overview
@@ -8,7 +9,7 @@ This assessment documents the quality checks performed on the source datasets be
 The project uses five primary datasets: encounters, patients, procedures, payers and organisations. A data dictionary was also supplied to support field interpretation.
 
 | Dataset | Records | Columns |
-|---|---:|---:|
+|------: | ---: |
 | Encounters | 27,891 | 14 |
 | Patients | 974 | 20 |
 | Procedures | 47,701 | 9 |
@@ -23,7 +24,7 @@ The five operational datasets contain 76,577 records in total.
 Missing values were identified in several fields.
 
 | Dataset | Field | Missing records | Interpretation |
-|---|---|---:|---|
+| --- | --- | ---: | --- |
 | Encounters | REASONCODE | 19,541 | Reason codes are not populated for many encounters |
 | Encounters | REASONDESCRIPTION | 19,541 | Reason descriptions are not populated for many encounters |
 | Patients | DEATHDATE | 820 | May indicate patients without a recorded death date |
@@ -47,7 +48,7 @@ No exact duplicate rows were found in any of the six supplied datasets.
 Primary key checks:
 
 | Dataset | Primary key | Records | Unique keys | Missing keys |
-|---|---|---:|---:|---:|
+| --- | --- | ---: | ---: | ---: |
 | Encounters | Id | 27,891 | 27,891 | 0 |
 | Patients | Id | 974 | 974 | 0 |
 | Payers | Id | 10 | 10 | 0 |
@@ -60,7 +61,7 @@ All tested primary keys were unique and non-missing.
 Foreign key checks confirmed that all tested references matched their corresponding records.
 
 | Reference | Records tested | Unmatched |
-|---|---:|---:|
+| --- | ---: | ---: |
 | Encounters → Patients | 27,891 | 0 |
 | Encounters → Payers | 27,891 | 0 |
 | Encounters → Organisations | 27,891 | 0 |
@@ -78,7 +79,7 @@ The encounter dataset covers 2 January 2011 to 5 February 2022. Procedure record
 Encounter duration was calculated as the difference between the stop and start timestamps.
 
 | Check | Encounters | Procedures |
-|---|---:|---:|
+| --- | ---: | ---: |
 | Records tested | 27,891 | 47,701 |
 | Start after stop | 0 | 0 |
 | Start equal to stop | 0 | 2 |
@@ -102,7 +103,7 @@ Urgent care and wellness encounters also showed repeated 15-minute durations. Th
 The three financial fields in the encounter dataset had no missing or negative values.
 
 | Field | Mean | Minimum | Maximum |
-|---|---:|---:|---:|
+| --- | ---: | ---: | ---: |
 | BASE_ENCOUNTER_COST | 116.18 | 85.55 | 146.18 |
 | TOTAL_CLAIM_COST | 3,639.68 | 0.00 | 641,882.70 |
 | PAYER_COVERAGE | 1,114.97 | 0.00 | 247,751.42 |

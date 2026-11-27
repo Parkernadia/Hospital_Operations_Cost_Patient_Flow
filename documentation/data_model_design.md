@@ -1,4 +1,5 @@
 # Data Model Design
+
 ## Hospital Operations, Cost & Patient Flow Intelligence
 
 ### 1. Overview
@@ -14,7 +15,7 @@ The model separates encounter-level records from procedure-level records to pres
 **Grain:** One row per encounter.
 
 | Attribute | Description |
-|---|---|
+| --- | --- |
 | Id | Unique encounter identifier |
 | PATIENT | Patient reference key |
 | PAYER | Payer reference key |
@@ -35,7 +36,7 @@ The model separates encounter-level records from procedure-level records to pres
 **Grain:** One row per procedure.
 
 | Attribute | Description |
-|---|---|
+| --- | --- |
 | PROCEDURE_ID | Generated unique procedure row identifier |
 | PATIENT | Patient reference key |
 | ENCOUNTER | Related encounter identifier |
@@ -58,7 +59,7 @@ The model separates encounter-level records from procedure-level records to pres
 ### 3. Dimension Tables
 
 | Dimension | Key | Records | Purpose |
-|---|---|---:|---|
+| --- | --- | ---: | --- |
 | DimPatients | PATIENT | 974 | Patient reference and distinct patient counting |
 | DimPayers | PAYER | 10 | Payer identification and grouping |
 | DimOrganizations | ORGANIZATION | 1 | Organisation reference |
@@ -74,7 +75,7 @@ The date dimension covers 2 January 2011 to 5 February 2022 and includes year, q
 The model uses one-to-many relationships from dimensions to fact tables.
 
 | One side | Many side | Relationship |
-|---|---|---|
+| --- | --- | --- |
 | DimPatients | FactEncounters | PATIENT |
 | DimPatients | FactProcedures | PATIENT |
 | DimPayers | FactEncounters | PAYER |
@@ -92,32 +93,32 @@ No direct relationship was created between FactEncounters and FactProcedures.
 
 ### 5. Modelling Decisions
 
-**Separate fact tables**
+**Separate fact tables*
 
 Encounters and procedures have different levels of detail. Combining procedure rows directly with encounter rows would repeat encounter-level financial values for encounters containing multiple procedures.
 
 Keeping the fact tables separate avoids this duplication.
 
-**Inherited procedure attributes**
+**Inherited procedure attributes*
 
 Payer, organisation and encounter class are inherited by each procedure from its associated encounter. This enables shared dimension filtering without creating a direct fact-to-fact relationship.
 
-**Date modelling**
+**Date modelling*
 
 The date dimension filters encounters by encounter start date and procedures by procedure date.
 
-**Derived duration**
+**Derived duration**  
 
 Duration is calculated from the difference between stop and start timestamps. Original timestamps are retained.
 
-**Financial interpretation**
+**Financial interpretation**  
 
 The model does not assume that total claim cost equals encounter base cost plus procedure base costs. These fields are analysed separately.
 
 ### 6. Validation
 
 | Validation | Result |
-|---|---|
+|------|
 | FactEncounters record count | 27,891 — PASS |
 | FactProcedures record count | 47,701 — PASS |
 | FactEncounters unique keys | 27,891 — PASS |
@@ -134,7 +135,7 @@ The model does not assume that total claim cost equals encounter base cost plus 
 The following seven prepared CSV files were exported to `data/processed/`:
 
 | File | Records | Columns |
-|---|---:|---:|
+| --- | ---: | ---: |
 | fact_encounters.csv | 27,891 | 14 |
 | fact_procedures.csv | 47,701 | 15 |
 | dim_patients.csv | 974 | 1 |

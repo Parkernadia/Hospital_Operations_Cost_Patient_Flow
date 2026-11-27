@@ -1,4 +1,5 @@
 # KPI Definitions
+
 ## Hospital Operations, Cost & Patient Flow Intelligence
 
 ### 1. Purpose
@@ -8,7 +9,7 @@ This document defines the key performance indicators used in the Power BI dashbo
 ### 2. Encounter KPIs
 
 | KPI | Calculation | Interpretation |
-|---|---|---|
+| --- | --- | --- |
 | Total Encounters | Count of rows in FactEncounters | Number of encounter records |
 | Total Patients | Distinct count of PATIENT in FactEncounters | Distinct patients represented by the selected encounters |
 | Average Encounter Duration (Hours) | Average of DURATION_HOURS | Mean elapsed encounter duration |
@@ -19,7 +20,7 @@ This document defines the key performance indicators used in the Power BI dashbo
 ### 3. Financial and Payer KPIs
 
 | KPI | Calculation | Interpretation |
-|---|---|---|
+| --- | --- | --- |
 | Total Claim Cost | Sum of TOTAL_CLAIM_COST | Aggregate recorded encounter claim cost |
 | Total Payer Coverage | Sum of PAYER_COVERAGE | Aggregate recorded payer coverage |
 | Average Claim Cost | Average of TOTAL_CLAIM_COST | Mean claim cost per encounter |
@@ -29,7 +30,7 @@ This document defines the key performance indicators used in the Power BI dashbo
 ### 4. Procedure KPIs
 
 | KPI | Calculation | Interpretation |
-|---|---|---|
+| --- | --- | --- |
 | Total Procedures | Count of rows in FactProcedures | Number of procedure records |
 | Total Procedure Base Cost | Sum of BASE_COST | Aggregate recorded procedure base cost |
 | Average Procedure Base Cost | Average of BASE_COST | Mean base cost per procedure record |

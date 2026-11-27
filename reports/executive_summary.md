@@ -1,4 +1,5 @@
 # Executive Summary
+
 ## Hospital Operations, Cost & Patient Flow Intelligence
 
 ### 1. Project Overview
@@ -10,7 +11,7 @@ The objective is to provide a consolidated view of operational and financial pat
 The analysis uses five primary datasets covering:
 
 | Dataset | Records |
-|---|---:|
+| --- | ---: |
 | Encounters | 27,891 |
 | Patients | 974 |
 | Procedures | 47,701 |

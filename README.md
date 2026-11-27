@@ -21,7 +21,7 @@ The objective is to transform raw healthcare data into meaningful operational an
 ## Tools & Technologies
 
 | Area | Tools |
-|---|---|
+| --- | --- |
 | Programming and data analysis | Python, pandas, NumPy |
 | Data preparation | Python, pandas, Power Query |
 | Database and querying | PostgreSQL, SQL |
@@ -35,7 +35,7 @@ The objective is to transform raw healthcare data into meaningful operational an
 The project uses five primary healthcare datasets and a supporting data dictionary.
 
 | Dataset | Records |
-|---|---:|
+| --- | ---: |  
 | Encounters | 27,891 |
 | Patients | 974 |
 | Procedures | 47,701 |
@@ -63,11 +63,13 @@ Raw and processed datasets are excluded from this repository to protect data int
 
 Prepared two fact tables and five dimension tables.
 
-**Fact tables**
+**Fact tables**  
+
 - `fact_encounters` – One row per encounter.
 - `fact_procedures` – One row per procedure.
 
-**Dimension tables**
+**Dimension tables**  
+
 - `dim_patients`
 - `dim_payers`
 - `dim_organizations`
@@ -81,7 +83,7 @@ The dimensional model uses one-to-many relationships from dimensions to fact tab
 The interactive dashboard contains five analytical pages:
 
 | Page | Focus |
-|---|---|
+| --- | --- |
 | Executive Overview | Overall encounter, patient, financial and procedure KPIs |
 | Encounter Analysis | Encounter volumes, class distribution and duration |
 | Financial & Payer Analysis | Claim costs, payer coverage and zero-coverage encounters |
@@ -95,6 +97,7 @@ Interactive filters support exploration by year, encounter class and payer.
 Key Power BI measures were independently compared with Python calculations.
 
 Validation covered:
+
 - Encounter and patient counts.
 - Encounter duration statistics.
 - Encounters exceeding 24 hours.
@@ -105,7 +108,7 @@ Validation covered:
 ## Selected Analytical Findings
 
 | Indicator | Finding |
-|---|---:|
+| --- | ---: |
 | Total encounters | 27,891 |
 | Distinct patients | 974 |
 | Total procedures | 47,701 |
@@ -193,3 +196,4 @@ The project demonstrates an end-to-end analytical workflow covering data inspect
 - Encounter duration is calculated from elapsed timestamps and is not automatically equivalent to inpatient length of stay.
 - The available data does not establish a reliable patient readmission or return-visit definition.
 - Patient-identifiable demographic and contact details are excluded from the analytical model.
+  

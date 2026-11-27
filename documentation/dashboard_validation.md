@@ -1,4 +1,5 @@
 # Dashboard Validation
+
 ## Hospital Operations, Cost & Patient Flow Intelligence
 
 ### 1. Purpose
@@ -20,7 +21,7 @@ The report contains five pages:
 The following Power BI measures were compared with independently calculated Python results.
 
 | Measure | Expected result | Validation |
-|---|---:|---|
+| --- | ---: | --- |
 | Total Encounters | 27,891 | PASS |
 | Total Patients | 974 | PASS |
 | Average Encounter Duration (Hours) | 7.27 | PASS |
@@ -40,7 +41,7 @@ The displayed values were checked against Python calculations. The figures above
 ### 4. Page-Level Filter Validation
 
 | Dashboard page | Validation performed | Status |
-|---|---|---|
+| --- | --- | --- |
 | Executive Overview | Year, encounter class and payer slicers; visual response | PASS |
 | Encounter Analysis | Year and encounter class slicers; duration calculations | PASS |
 | Financial & Payer Analysis | Year, encounter class and payer slicers | Pending final confirmation |
